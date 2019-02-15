@@ -41,17 +41,33 @@ resource "aws_elasticsearch_domain" "es" {
     zone_awareness_enabled   = "${var.es_zone_awareness}"
   }
 
-  # advanced_options {
-  # }
+  log_publishing_options = [{
+    log_type                 = "INDEX_SLOW_LOGS"
+    cloudwatch_log_group_arn = "${var.index_slow_log_cloudwatch_log_group}"
+    enabled                  = "${var.index_slow_log_enabled}"
+  },
+    {
+      log_type                 = "SEARCH_SLOW_LOGS"
+      cloudwatch_log_group_arn = "${var.search_slow_log_cloudwatch_log_group}"
+      enabled                  = "${var.search_slow_log_enabled}"
+    },
+    {
+      log_type                 = "ES_APPLICATION_LOGS"
+      cloudwatch_log_group_arn = "${var.es_app_log_cloudwatch_log_group}"
+      enabled                  = "${var.es_app_log_enable}"
+    },
+  ]
 
   ebs_options {
     ebs_enabled = "${var.ebs_volume_size > 0 ? true : false}"
     volume_size = "${var.ebs_volume_size}"
     volume_type = "${var.ebs_volume_type}"
   }
+
   snapshot_options {
     automated_snapshot_start_hour = "${var.snapshot_start_hour}"
   }
+
   tags = "${merge(var.tags, map(
     "Domain", "${local.domain_name}"
   ))}"
