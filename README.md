@@ -117,15 +117,17 @@ module "es" {
 | ebs\_volume\_size | Optionally use EBS volumes for data storage by specifying volume size in GB (default 0) | string | `"0"` | no |
 | ebs\_volume\_type | Storage type of EBS volumes, if used (default gp2) | string | `"gp2"` | no |
 | encrypt\_at\_rest | Enable encrption at rest (only specific instance family types support it: m4, c4, r4, i2, i3 default: false) | string | `"false"` | no |
+| es\_app\_log\_cloudwatch\_log\_group | ARN for the CloudWatch log group to be use for the Elasticsearch application logs | string | `""` | no |
 | es\_version | Version of Elasticsearch to deploy (default 5.1) | string | `"5.1"` | no |
 | es\_zone\_awareness | Enable zone awareness for Elasticsearch cluster (default false) | string | `"false"` | no |
+| index\_slow\_log\_cloudwatch\_log\_group | ARN for the CloudWatch log group to be use for the index slow logs | string | `""` | no |
 | instance\_count | Number of data nodes in the cluster (default 6) | string | `"6"` | no |
 | instance\_type | ES instance type for data nodes in the cluster (default t2.small.elasticsearch) | string | `"t2.small.elasticsearch"` | no |
 | kms\_key\_id | KMS key used for elasticsearch | string | `""` | no |
-| log\_publishing\_options | List of maps of options for publishing slow logs to CloudWatch Logs. | list | `[]` | no |
 | management\_iam\_roles | List of IAM role ARNs from which to permit management traffic (default ['*']).  Note that a client must match both the IP address and the IAM role patterns in order to be permitted access. | list | `[ "*" ]` | no |
 | management\_public\_ip\_addresses | List of IP addresses from which to permit management traffic (default []).  Note that a client must match both the IP address and the IAM role patterns in order to be permitted access. | list | `[]` | no |
 | node\_to\_node\_encryption\_enabled | Whether to enable node-to-node encryption. | string | `"false"` | no |
+| search\_slow\_log\_cloudwatch\_log\_group | ARN for the CloudWatch log group to be use for the search slow logs | string | `""` | no |
 | snapshot\_start\_hour | Hour at which automated snapshots are taken, in UTC (default 0) | string | `"0"` | no |
 | tags | tags to apply to all resources | map | `{}` | no |
 | use\_prefix | Flag indicating whether or not to use the domain_prefix. Default: true | string | `"true"` | no |
