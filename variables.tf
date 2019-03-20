@@ -1,3 +1,8 @@
+variable "create_iam_service_linked_role" {
+  description = "Whether to create IAM service linked role for AWS ElasticSearch service. Can be only one per AWS account."
+  default     = true
+}
+
 variable "domain_name" {
   description = "Domain name for Elasticsearch cluster"
   default     = "es-domain"
@@ -96,6 +101,11 @@ variable "dedicated_master_threshold" {
   default     = 10
 }
 
+variable "advanced_options" {
+  description = "Map of key-value string pairs to specify advanced configuration options. Note that the values for these configuration options must be strings (wrapped in quotes) or they may be wrong and cause a perpetual diff, causing Terraform to want to recreate your Elasticsearch domain on every apply."
+  default     = {}
+}
+
 variable "index_slow_log_cloudwatch_log_group" {
   description = "ARN for the CloudWatch log group to be use for the index slow logs"
   default     = ""
@@ -111,5 +121,7 @@ variable "es_app_log_cloudwatch_log_group" {
   default     = ""
 }
 
-# vim: set et fenc=utf-8 ff=unix ft=terraform sts=2 sw=2 ts=2 : 
-
+variable "node_to_node_encryption_enabled" {
+  description = "Whether to enable node-to-node encryption."
+  default     = false
+}

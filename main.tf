@@ -1,6 +1,5 @@
-# Elasticsearch domain
 data "aws_iam_policy_document" "es_management_access" {
-  count = "${length(var.vpc_options["subnet_ids"]) > 0 ? 0 : 1}"
+  count = "${!local.inside_vpc ? 1 : 0}"
 
   statement {
     actions = [
@@ -28,9 +27,17 @@ data "aws_iam_policy_document" "es_management_access" {
 }
 
 resource "aws_elasticsearch_domain" "es" {
-  count                 = "${length(var.vpc_options["subnet_ids"]) > 0 ? 0 : 1}"
+  count = "${!local.inside_vpc ? 1 : 0}"
+
+  depends_on = ["aws_iam_service_linked_role.es"]
+
   domain_name           = "${local.domain_name}"
   elasticsearch_version = "${var.es_version}"
+
+  encrypt_at_rest = {
+    enabled    = "${var.encrypt_at_rest}"
+    kms_key_id = "${var.kms_key_id}"
+  }
 
   cluster_config {
     instance_type            = "${var.instance_type}"
@@ -40,6 +47,8 @@ resource "aws_elasticsearch_domain" "es" {
     dedicated_master_type    = "${var.instance_count >= var.dedicated_master_threshold ? (var.dedicated_master_type != "false" ? var.dedicated_master_type : var.instance_type) : ""}"
     zone_awareness_enabled   = "${var.es_zone_awareness}"
   }
+
+  advanced_options = "${var.advanced_options}"
 
   log_publishing_options = [{
     log_type                 = "INDEX_SLOW_LOGS"
@@ -58,6 +67,10 @@ resource "aws_elasticsearch_domain" "es" {
     },
   ]
 
+  node_to_node_encryption {
+    enabled = "${var.node_to_node_encryption_enabled}"
+  }
+
   ebs_options {
     ebs_enabled = "${var.ebs_volume_size > 0 ? true : false}"
     volume_size = "${var.ebs_volume_size}"
@@ -68,16 +81,12 @@ resource "aws_elasticsearch_domain" "es" {
     automated_snapshot_start_hour = "${var.snapshot_start_hour}"
   }
 
-  tags = "${merge(var.tags, map(
-    "Domain", "${local.domain_name}"
-  ))}"
+  tags = "${merge(map("Domain", local.domain_name), var.tags)}"
 }
 
 resource "aws_elasticsearch_domain_policy" "es_management_access" {
-  count           = "${length(var.vpc_options["subnet_ids"]) > 0 ? 0 : 1}"
+  count = "${!local.inside_vpc ? 1 : 0}"
+
   domain_name     = "${local.domain_name}"
   access_policies = "${data.aws_iam_policy_document.es_management_access.json}"
 }
-
-# vim: set et fenc= ff=unix ft=terraform sts=2 sw=2 ts=2 : 
-
